@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+			http://www.springframework.org/schema/beans/spring-beans.xsd
+	   		http://www.springframework.org/schema/context 
+	   		http://www.springframework.org/schema/context/spring-context.xsd
+			http://www.springframework.org/schema/aop 
+			http://www.springframework.org/schema/aop/spring-aop.xsd
+			http://www.springframework.org/schema/tx 
+			http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:mybatis-config.xml" />
+		<property name="mapperLocations" ref="myMapperLocations" />
+	</bean>
+	
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg index="0" ref="sqlSessionFactory"/>
+	</bean>
+	
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="sqlSessionTemplateBeanName" value="sqlSessionTemplate"/>
+		<property name="basePackage" ref="myBasePackage" />
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+
+	<aop:aspectj-autoproxy proxy-target-class="true"/>
+	<bean id="dsAdviceAspect" class="com.niuhome.framework.ds.DataSourceAdvice">
+		<property name="dbGroupList" ref="dbGroupList"/>
+	</bean>
+	<aop:config>
+		<aop:aspect ref="dsAdviceAspect">
+			<aop:pointcut id="dsAdvicePointCut" expression="(execution(* com.niuhome.*.service..*.*(..)))" />
+			<aop:around pointcut-ref="dsAdvicePointCut" method="advice" />
+		</aop:aspect>
+	</aop:config>
+
+
+
+
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+
+
+</beans>

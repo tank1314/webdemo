@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	   xsi:schemaLocation="http://www.springframework.org/schema/context
+          http://www.springframework.org/schema/context/spring-context.xsd
+          http://www.springframework.org/schema/data/mongo
+          http://www.springframework.org/schema/data/mongo/spring-mongo.xsd
+          http://www.springframework.org/schema/beans
+          http://www.springframework.org/schema/beans/spring-beans.xsd"
+	   default-autowire="byName">
+
+	<bean id="mongoConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="locations">
+			<list>
+				<value>classpath:mongo.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="mongoSeeds" class="java.util.ArrayList">
+		<constructor-arg index="0">
+			<list>
+				<bean class="com.mongodb.ServerAddress">
+					<constructor-arg name="host" value="${mongo.host}" />
+					<constructor-arg name="port" value="${mongo.port}" />
+				</bean>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="mongoCredentials" class="java.util.ArrayList">
+		<constructor-arg index="0">
+			<list>
+				<bean class="com.niuhome.framework.mongo.MongoCredentialFactory">
+					<constructor-arg name="userName" value="${mongo.user.name}" />
+					<constructor-arg name="password" value="${mongo.password}" />
+					<constructor-arg name="authDbName" value="${mongo.auth.dbname}" />
+				</bean>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="mongo" class="com.niuhome.framework.mongo.MongoClientFactory">
+		<constructor-arg name="needAuth" value="${mongo.need.auth}"/>
+		<constructor-arg name="seeds" ref="mongoSeeds"/>
+		<constructor-arg name="credentialsList" ref="mongoCredentials"/>
+	</bean>
+
+	<mongo:db-factory dbname="${mongo.db}" mongo-ref="mongo"/>
+
+	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg name="mongoDbFactory" ref="mongoDbFactory"/>
+	</bean>
+
+</beans>
