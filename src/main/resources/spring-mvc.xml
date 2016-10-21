@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+			http://www.springframework.org/schema/beans/spring-beans.xsd 
+	        http://www.springframework.org/schema/context 
+	        http://www.springframework.org/schema/context/spring-context.xsd 
+			http://www.springframework.org/schema/tx 
+			http://www.springframework.org/schema/tx/spring-tx.xsd 
+			http://www.springframework.org/schema/mvc 
+			http://www.springframework.org/schema/mvc/spring-mvc.xsd 
+			http://www.springframework.org/schema/aop 
+			http://www.springframework.org/schema/aop/spring-aop.xsd"
+	default-autowire="byName">
+
+	<mvc:annotation-driven>
+		<mvc:message-converters register-defaults="true">
+			<bean id="stringHttpMessageConverter" class="org.springframework.http.converter.StringHttpMessageConverter">
+				<constructor-arg index="0">
+					<bean class="java.nio.charset.Charset" factory-method="forName">
+						<constructor-arg value="UTF-8" />
+					</bean>
+				</constructor-arg>
+				<property name="supportedMediaTypes">
+					<list>
+						<value>text/html;charset=UTF-8</value>
+						<value>text/plain;charset=UTF-8</value>
+						<value>application/json;charset=UTF-8</value>
+						<value>application/xml;charset=UTF-8</value>
+						<value>application/x-www-form-urlencoded;charset=UTF-8</value>
+					</list>
+				</property>
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+
+	<context:component-scan base-package="com.niuhome.cs.controller" />
+	<mvc:resources mapping="/static/**" location="/static/" />
+
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="5242880" />
+	</bean>
+
+	<bean id="viewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+		<property name="viewClass">
+			<value>org.springframework.web.servlet.view.tiles2.TilesView</value>
+		</property>
+	</bean>
+	<bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles2.TilesConfigurer">
+		<property name="definitions">
+			<list>
+				<value>classpath:tiles/tiles-*.xml</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basenames">
+			<list>
+				<value>bundles.message</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="localeResolver" class="org.springframework.web.servlet.i18n.SessionLocaleResolver" />
+
+	<bean class="com.niuhome.framework.util.TextUtil">
+		<property name="messageSource" ref="messageSource" />
+	</bean>
+
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<bean class="com.niuhome.framework.interceptor.CommonInterceptor" />
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<bean class="com.niuhome.framework.interceptor.CorsInterceptor" />
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/**" />
+			<bean class="com.niuhome.framework.interceptor.AccessLogInterceptor" />
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/v1/linqu/**" />
+			<mvc:exclude-mapping path="/v1/linqu/delivertime" />
+			<mvc:exclude-mapping path="/v1/linqu/deliverfee" />
+			<mvc:exclude-mapping path="/v1/linqu/api/order/notify" />
+			<mvc:exclude-mapping path="/v1/linqu/errand/home" />
+			<mvc:exclude-mapping path="/v1/linqu/default/products" />
+			<mvc:exclude-mapping path="/v1/linqu/order/list" />
+			<mvc:exclude-mapping path="/v1/linqu/order/list_by_param" />
+			<mvc:exclude-mapping path="/v1/linqu/order/down_list_by_param" />
+			<mvc:exclude-mapping path="/v1/linqu/order/adjuststatus" />
+			<mvc:exclude-mapping path="/v1/linqu/fee/rule-of-paidui" />
+			<bean class="com.niuhome.domain.interceptor.OnlyMerchantInterceptor" />
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/v1/linqu/order/list" />
+			<mvc:mapping path="/v1/linqu/order/list_by_param" />
+			<mvc:mapping path="/v1/linqurpt/**" />
+			<bean class="com.niuhome.domain.interceptor.OnlyEmployeeInterceptor" />
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/v1/linqu/**" />
+			<mvc:mapping path="/v1/linqurpt/**" />
+			<mvc:exclude-mapping path="/v1/linqu/delivertime" />
+			<mvc:exclude-mapping path="/v1/linqu/deliverfee" />
+			<mvc:exclude-mapping path="/v1/linqu/api/order/notify" />
+			<mvc:exclude-mapping path="/v1/linqu/errand/home" />
+			<mvc:exclude-mapping path="/v1/linqu/default/products" />
+			<mvc:exclude-mapping path="/v1/linqu/fee/rule-of-paidui" />
+			<bean class="com.niuhome.domain.interceptor.LoginInterceptor" />
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/v1/linqu/**" />
+			<mvc:mapping path="/v1/linqurpt/**" />
+			<mvc:exclude-mapping path="/v1/linqu/api/order/notify" />
+			<bean class="com.niuhome.domain.interceptor.MerchantAuthInterceptor" />
+		</mvc:interceptor>
+	</mvc:interceptors>
+</beans>
+

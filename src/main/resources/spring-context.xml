@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+			http://www.springframework.org/schema/beans/spring-beans.xsd
+	   		http://www.springframework.org/schema/context 
+	   		http://www.springframework.org/schema/context/spring-context.xsd
+			http://www.springframework.org/schema/aop 
+			http://www.springframework.org/schema/aop/spring-aop.xsd
+			http://www.springframework.org/schema/tx 
+			http://www.springframework.org/schema/tx/spring-tx.xsd"
+	default-autowire="byName">
+
+	<import resource="classpath*:framework-ctx.xml"/>
+	<import resource="classpath*:framework-ctx-ds.xml" />
+	<import resource="classpath*:framework-ctx-redis.xml"/>
+	<import resource="classpath*:framework-ctx-mongo.xml"/>
+	<import resource="classpath:spring-dubbo.xml" />
+
+	<context:component-scan base-package="com.tank.web,com.framework.tank" />
+
+
+	<bean id="jdbcConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreUnresolvablePlaceholders" value="true" />
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="dsMaster" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="${master.jdbc.driver.class}" />
+		<property name="url" value="${master.jdbc.url}" />
+		<property name="username" value="${master.jdbc.username}" />
+		<property name="password" value="${master.jdbc.password}" />
+		<property name="defaultReadOnly" value="${master.jdbc.default.read.only}" />
+		<property name="filters" value="${master.jdbc.filters}" />
+		<property name="maxActive" value="${master.jdbc.max.active}" />
+		<property name="initialSize" value="${master.jdbc.initial.size}" />
+		<property name="maxWait" value="${master.jdbc.max.wait}" />
+		<property name="removeAbandoned" value="${master.jdbc.remove.abandoned}" />
+		<property name="removeAbandonedTimeout" value="${master.jdbc.remove.abandoned.timeout}" />
+		<property name="minIdle" value="${master.jdbc.min.idle}" />
+		<property name="timeBetweenEvictionRunsMillis" value="${master.jdbc.time.between.eviction.runs.millis}" />
+		<property name="minEvictableIdleTimeMillis" value="${master.jdbc.min.evictable.idle.time.millis}" />
+		<property name="validationQuery" value="${master.jdbc.validation.query}" />
+		<property name="testWhileIdle" value="${master.jdbc.test.while.idle}" />
+		<property name="testOnBorrow" value="${master.jdbc.test.on.borrow}" />
+		<property name="testOnReturn" value="${master.jdbc.test.on.return}" />
+		<property name="poolPreparedStatements" value="${master.jdbc.pool.prepared.statements}" />
+		<property name="maxPoolPreparedStatementPerConnectionSize" value="${master.jdbc.max.pool.prepared.statement.per.connection.size}" />
+		<property name="maxOpenPreparedStatements" value="${master.jdbc.max.open.prepared.statements}" />
+	</bean>
+
+	<bean id="dsSlave1" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="${slave.jdbc.driver.class1}" />
+		<property name="url" value="${slave.jdbc.url1}" />
+		<property name="username" value="${slave.jdbc.username1}" />
+		<property name="password" value="${slave.jdbc.password1}" />
+		<property name="defaultReadOnly" value="${slave.jdbc.default.read.only1}" />
+		<property name="filters" value="${slave.jdbc.filters1}" />
+		<property name="maxActive" value="${slave.jdbc.max.active1}" />
+		<property name="initialSize" value="${slave.jdbc.initial.size1}" />
+		<property name="maxWait" value="${slave.jdbc.max.wait1}" />
+		<property name="removeAbandoned" value="${slave.jdbc.remove.abandoned1}" />
+		<property name="removeAbandonedTimeout" value="${slave.jdbc.remove.abandoned.timeout1}" />
+		<property name="minIdle" value="${slave.jdbc.min.idle1}" />
+		<property name="timeBetweenEvictionRunsMillis" value="${slave.jdbc.time.between.eviction.runs.millis1}" />
+		<property name="minEvictableIdleTimeMillis" value="${slave.jdbc.min.evictable.idle.time.millis1}" />
+		<property name="validationQuery" value="${slave.jdbc.validation.query1}" />
+		<property name="testWhileIdle" value="${slave.jdbc.test.while.idle1}" />
+		<property name="testOnBorrow" value="${slave.jdbc.test.on.borrow1}" />
+		<property name="testOnReturn" value="${slave.jdbc.test.on.return1}" />
+		<property name="poolPreparedStatements" value="${slave.jdbc.pool.prepared.statements1}" />
+		<property name="maxPoolPreparedStatementPerConnectionSize" value="${slave.jdbc.max.pool.prepared.statement.per.connection.size1}" />
+		<property name="maxOpenPreparedStatements" value="${slave.jdbc.max.open.prepared.statements1}" />
+	</bean>
+
+	<bean id="dsSlave2" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="${slave.jdbc.driver.class2}" />
+		<property name="url" value="${slave.jdbc.url2}" />
+		<property name="username" value="${slave.jdbc.username2}" />
+		<property name="password" value="${slave.jdbc.password2}" />
+		<property name="defaultReadOnly" value="${slave.jdbc.default.read.only2}" />
+		<property name="filters" value="${slave.jdbc.filters2}" />
+		<property name="maxActive" value="${slave.jdbc.max.active2}" />
+		<property name="initialSize" value="${slave.jdbc.initial.size2}" />
+		<property name="maxWait" value="${slave.jdbc.max.wait2}" />
+		<property name="removeAbandoned" value="${slave.jdbc.remove.abandoned2}" />
+		<property name="removeAbandonedTimeout" value="${slave.jdbc.remove.abandoned.timeout2}" />
+		<property name="minIdle" value="${slave.jdbc.min.idle2}" />
+		<property name="timeBetweenEvictionRunsMillis" value="${slave.jdbc.time.between.eviction.runs.millis2}" />
+		<property name="minEvictableIdleTimeMillis" value="${slave.jdbc.min.evictable.idle.time.millis2}" />
+		<property name="validationQuery" value="${slave.jdbc.validation.query2}" />
+		<property name="testWhileIdle" value="${slave.jdbc.test.while.idle2}" />
+		<property name="testOnBorrow" value="${slave.jdbc.test.on.borrow2}" />
+		<property name="testOnReturn" value="${slave.jdbc.test.on.return2}" />
+		<property name="poolPreparedStatements" value="${slave.jdbc.pool.prepared.statements2}" />
+		<property name="maxPoolPreparedStatementPerConnectionSize" value="${slave.jdbc.max.pool.prepared.statement.per.connection.size2}" />
+		<property name="maxOpenPreparedStatements" value="${slave.jdbc.max.open.prepared.statements2}" />
+	</bean>
+
+	<bean id="dsSlave3" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="${slave.jdbc.driver.class3}" />
+		<property name="url" value="${slave.jdbc.url3}" />
+		<property name="username" value="${slave.jdbc.username3}" />
+		<property name="password" value="${slave.jdbc.password3}" />
+		<property name="defaultReadOnly" value="${slave.jdbc.default.read.only3}" />
+		<property name="filters" value="${slave.jdbc.filters3}" />
+		<property name="maxActive" value="${slave.jdbc.max.active3}" />
+		<property name="initialSize" value="${slave.jdbc.initial.size3}" />
+		<property name="maxWait" value="${slave.jdbc.max.wait3}" />
+		<property name="removeAbandoned" value="${slave.jdbc.remove.abandoned3}" />
+		<property name="removeAbandonedTimeout" value="${slave.jdbc.remove.abandoned.timeout3}" />
+		<property name="minIdle" value="${slave.jdbc.min.idle3}" />
+		<property name="timeBetweenEvictionRunsMillis" value="${slave.jdbc.time.between.eviction.runs.millis3}" />
+		<property name="minEvictableIdleTimeMillis" value="${slave.jdbc.min.evictable.idle.time.millis3}" />
+		<property name="validationQuery" value="${slave.jdbc.validation.query3}" />
+		<property name="testWhileIdle" value="${slave.jdbc.test.while.idle3}" />
+		<property name="testOnBorrow" value="${slave.jdbc.test.on.borrow3}" />
+		<property name="testOnReturn" value="${slave.jdbc.test.on.return3}" />
+		<property name="poolPreparedStatements" value="${slave.jdbc.pool.prepared.statements3}" />
+		<property name="maxPoolPreparedStatementPerConnectionSize" value="${slave.jdbc.max.pool.prepared.statement.per.connection.size3}" />
+		<property name="maxOpenPreparedStatements" value="${slave.jdbc.max.open.prepared.statements3}" />
+	</bean>
+
+
+	<bean id="dataSource" class="com.niuhome.framework.ds.DynamicDataSource">
+		<property name="targetDataSources">
+			<map key-type="java.lang.String">
+				<entry key="dsMaster" value-ref="dsMaster" />
+				<entry key="dsSlave1" value-ref="dsSlave1" />
+				<entry key="dsSlave2" value-ref="dsSlave2" />
+				<entry key="dsSlave3" value-ref="dsSlave3" />
+			</map>
+		</property>
+		<property name="defaultTargetDataSource" ref="dsMaster"/>
+	</bean>
+
+	<bean id="dbGroupList" class="java.util.ArrayList">
+		<constructor-arg index="0">
+			<list>
+				<bean class="com.niuhome.framework.ds.DataSourceAdvice.DbGroup">
+					<property name="key" value="nmw" />
+					<property name="isDefault" value="true" />
+					<property name="master" value="dsMaster" />
+					<property name="slaveList">
+						<list>
+							<value>dsSlave1</value>
+							<value>dsSlave2</value>
+							<value>dsSlave3</value>
+						</list>
+					</property>
+				</bean>
+			</list>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="myBasePackage" class="java.lang.String">
+		<constructor-arg index="0">
+			<value>com.niuhome.cs.mapper,com.niuhome.domain.mapper</value>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="myMapperLocations" class="java.util.ArrayList">
+		<constructor-arg index="0">
+			<list>
+				<value>classpath:com/niuhome/cs/mapper/**.xml</value>
+				<value>classpath:com/niuhome/domain/mapper/**.xml</value>
+			</list>
+		</constructor-arg>
+	</bean>
+</beans>
